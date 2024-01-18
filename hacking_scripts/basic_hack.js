@@ -17,17 +17,12 @@ export async function main(ns) {
         sec = ns.getServerSecurityLevel(target);
         mon = ns.getServerMoneyAvailable(target);
 
-        // Priority 1 - weaken security
-        if (sec > secthresh) {
+        if (sec > secthresh) {        // Priority 1 - weaken security
             await ns.weaken(target);
-        }
-
-        // Priority 2 - grow money
-        if (mon < monthresh) {
+        } else if (mon < monthresh) { // Priority 2 - grow money
             await ns.grow(target);
+        } else {                      // last priority - take money
+            await ns.hack(target);
         }
-
-        // Last Priority - Hack
-        await ns.hack(target);
     }
 }
