@@ -26,6 +26,9 @@ export async function main(ns) {
 
     // Start Primary Loop
     while (true) {
+        // Set varable to determine if any more targets exist
+        let targets_exist = false;
+
         // Get Current Player Hacking Level
         let ph = ns.getHackingLevel();
 
@@ -40,11 +43,12 @@ export async function main(ns) {
         // Itterate over all servers without backdoor access
         for (let server of servers) {
             if (!ns.hasRootAccess(server)) {
+                // Determine if I can pwn the server
                 let sh = ns.getServerRequiredHackingLevel(server);
                 let sp = ns.getServerNumPortsRequired(server);
-
                 let can_pwn = (sh < ph) & (sp <= port_opens);
 
+                // If sever can be pwnd, do so and inform user
                 if (can_pwn) {
                     ns.run('pwn.js', 1, server);
                     await ns.sleep(1000);
@@ -56,8 +60,17 @@ export async function main(ns) {
                     } else {
                         ns.tprint('Pwnd: '+server);
                     }
+
+                // Otherwise note that 
+                } else {
+                    targets_exist = true;
                 }
             }
+        }
+
+        // If no targets exist break the loop
+        if (!targets_exist) {
+            break;
         }
 
         // Wait one minute before restarting
