@@ -3,6 +3,7 @@ export async function main(ns) {
 
     // Set Constants
     const host = ns.getHostname();
+    const faction_servers = ["CSEC", "avmnite-02h", "I.I.I.I", "run4theh111s"];
 
     // Create array containing all server names
     let servers = [host];
@@ -40,14 +41,21 @@ export async function main(ns) {
         for (let server of servers) {
             if (!ns.hasRootAccess(server)) {
                 let sh = ns.getServerRequiredHackingLevel(server);
-                let sp = ns.getServerNumPortsRequired(host);
+                let sp = ns.getServerNumPortsRequired(server);
 
                 let can_pwn = (sh < ph) & (sp <= port_opens);
 
                 if (can_pwn) {
                     ns.run('pwn.js', 1, server);
-                    ns.tprint('Pwnd '+server)
                     await ns.sleep(1000);
+
+                    // Determine message to send
+                    let is_faction_server = faction_servers.includes(server);
+                    if (is_faction_server) {
+                        ns.tprint('Pwnd Faction Server: '+server);
+                    } else {
+                        ns.tprint('Pwnd: '+server);
+                    }
                 }
             }
         }
