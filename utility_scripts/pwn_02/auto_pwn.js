@@ -23,31 +23,36 @@ export async function main(ns) {
     }
 
 
-    // Get Current Player Hacking Level
-    let ph = ns.getHackingLevel();
+    // Start Primary Loop
+    while (true) {
+        // Get Current Player Hacking Level
+        let ph = ns.getHackingLevel();
 
-    // Determine how many port opening functions I have access to
-    let port_opens = 0
-    if (ns.fileExists("BruteSSH.exe", host)) {port_opens++;}
-    if (ns.fileExists("FTPCrack.exe", host)) {port_opens++;}
-    if (ns.fileExists("relaySMTP.exe", host)) {port_opens++;}
-    if (ns.fileExists("HTTPWorm.exe", host)) {port_opens++;}
-    if (ns.fileExists("SQLInject.exe", host)) {port_opens++;}
+        // Determine how many port opening functions I have access to
+        let port_opens = 0
+        if (ns.fileExists("BruteSSH.exe", host)) {port_opens++;}
+        if (ns.fileExists("FTPCrack.exe", host)) {port_opens++;}
+        if (ns.fileExists("relaySMTP.exe", host)) {port_opens++;}
+        if (ns.fileExists("HTTPWorm.exe", host)) {port_opens++;}
+        if (ns.fileExists("SQLInject.exe", host)) {port_opens++;}
 
-    // Itterate over all servers without backdoor access
-    for (let server of servers) {
-        if (!ns.hasRootAccess(server)) {
-            let sh = ns.getServerRequiredHackingLevel(server);
-            let sp = ns.getServerNumPortsRequired(host);
+        // Itterate over all servers without backdoor access
+        for (let server of servers) {
+            if (!ns.hasRootAccess(server)) {
+                let sh = ns.getServerRequiredHackingLevel(server);
+                let sp = ns.getServerNumPortsRequired(host);
 
-            let can_pwn = (sh < ph) & (sp <= port_opens);
+                let can_pwn = (sh < ph) & (sp <= port_opens);
 
-            if (can_pwn) {
-                ns.run('pwn.js', 1, server);
-                ns.tprint('Pwnd '+server)
-                await ns.sleep(1000);
+                if (can_pwn) {
+                    ns.run('pwn.js', 1, server);
+                    ns.tprint('Pwnd '+server)
+                    await ns.sleep(1000);
+                }
             }
         }
-    }
 
+        // Wait one minute before restarting
+        await ns.sleep(60*1000)
+    }
 }
