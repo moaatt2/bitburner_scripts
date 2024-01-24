@@ -1,5 +1,6 @@
 /** @param {NS} ns */
 export async function main(ns) {
+
     // Global list of all servers already searched
     const scanned = [];
     const path = [];
@@ -36,6 +37,15 @@ export async function main(ns) {
     // Start recursive find
     recursive_find(starting, target, ns);
 
-    // Print path
-    ns.tprint(path.reverse());
+    // Reverse the path
+    path.reverse();
+
+    // Create connection command
+    let out = '';
+    for (let i of path.slice(1)) {
+        out = out + "connect "+i+"; "     
+    }
+
+    // Print connection command
+    ns.tprint(out);
 }
